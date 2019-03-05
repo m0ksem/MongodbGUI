@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Mongodb_gui
 {
-     public partial class MainForm : Form
+    public partial class ViewCollection : Form
     {
         public MMongoDB mongo = null;
         private List<BsonDocument> databases;
@@ -24,49 +24,18 @@ namespace Mongodb_gui
         private TreeNode LastSelectedNode = null;
         private Color LastSelectedColor;
 
-        public MainForm()
+        private List<BsonDocument> items;
+
+        public ViewCollection(List<BsonDocument> items, IMongoCollection<BsonDocument> currentCollection)
         {
             InitializeComponent();
+            this.items = items;
+            this.currentCollection = currentCollection;
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void okay_Click(object sender, EventArgs e)
         {
-            ConnectForm connectForm = new ConnectForm(this);
-            Hide();
-            connectForm.ShowDialog();
-            if (mongo == null)
-            {
-                Close();
-                return;
-            }
-            Show();
-            MongoConnected();
-        }
-
-        public void MongoConnected()
-        {
-            databases = mongo.GetDataBases();
-
-            foreach (BsonDocument item in databases)
-            {
-                databaseComboBox.Items.Add(item.GetValue("name"));
-            }
-
-            databaseComboBox.SelectedIndex = 0;
-            currentDatabase = mongo.GetDataBase(databases[0].GetValue("name").ToString());
-            collections = mongo.GetCollectionsList(currentDatabase);
-        
-            collectionsComboBox.Items.Clear();
-            foreach (BsonDocument item in collections)
-            {
-                collectionsComboBox.Items.Add(item.GetValue("name"));
-            }
-
-            collectionsComboBox.SelectedIndex = 0;
-            currentCollection = currentDatabase.GetCollection<BsonDocument>(collections[0].GetValue("name").ToString());
-
-            var items = mongo.GetItems(currentCollection);
-            FillCollectionView(items);
+            this.Close();
         }
 
         public void FillCollectionView(List<BsonDocument> items)
@@ -77,15 +46,15 @@ namespace Mongodb_gui
             {
                 var treeNode = new TreeNode();
                 treeNode.Expand();
-                treeNode.Text = items.IndexOf(item) + ": Object" ;
+                treeNode.Text = items.IndexOf(item) + ": Object";
                 treeNode.BackColor = Color.Honeydew;
                 treeNode.Tag = item;
 
                 foreach (BsonElement element in item)
-                {               
+                {
                     treeNode.Nodes.Add(CreateTreeNode(element));
                 }
-              
+
                 CollectionView.Nodes.Add(treeNode);
             }
         }
@@ -93,13 +62,13 @@ namespace Mongodb_gui
         private TreeNode CreateTreeNode(BsonElement element)
         {
             TreeNode node = new TreeNode();
-           
+
             if (element.Value.BsonType == BsonType.ObjectId)
             {
                 node.BackColor = Color.WhiteSmoke;
                 node.Text = "ID: " + element.Value + "  - " + element.Value.BsonType;
                 node.Tag = element;
-            } 
+            }
             else if (element.Value.BsonType == BsonType.Array)
             {
                 node.Text = element.Name + "  - Array";
@@ -144,7 +113,7 @@ namespace Mongodb_gui
                         {
                             arrayNode.Nodes.Add(CreateTreeNode(e));
                         }
-                        
+
                         node.Nodes.Add(arrayNode);
                     }
                 }
@@ -169,7 +138,7 @@ namespace Mongodb_gui
                 node.Text = element.Name + ": " + element.Value + "  - " + element.Value.BsonType;
                 node.Tag = element;
             }
-      
+
             return node;
         }
 
@@ -222,7 +191,7 @@ namespace Mongodb_gui
                             BsonElement el = new BsonElement(null, e);
                             node.Nodes.Add(CreateTreeNode(el));
                         }
-                        
+
                         node.Nodes.Add(arrayNode);
                     }
                 }
@@ -248,35 +217,15 @@ namespace Mongodb_gui
             return node;
         }
 
-        private void collectionsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var items = mongo.GetItems(currentDatabase.GetCollection<BsonDocument>(collections[collectionsComboBox.SelectedIndex].GetValue("name").ToString()));
-            CollectionView.Nodes.Clear();
-            FillCollectionView(items);
-        }
-
-        private void databaseComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            currentDatabase = mongo.GetDataBase(databases[databaseComboBox.SelectedIndex].GetValue("name").ToString());
-            collections = mongo.GetCollectionsList(currentDatabase);
-
-            collectionsComboBox.Items.Clear();
-            foreach (BsonDocument item in collections)
-            {
-                collectionsComboBox.Items.Add(item.GetValue("name"));
-            }
-            collectionsComboBox.SelectedIndex = 0;
-
-            var items = mongo.GetItems(currentDatabase.GetCollection<BsonDocument>(collections[0].GetValue("name").ToString()));
-            FillCollectionView(items);
-        }
-
         private void CollectionView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             editPanel.Enabled = true;
             addButton.Enabled = false;
+            removeButton.Enabled = true;
+            button1.Enabled = true;
 
-            if (e.Node.Tag is BsonDocument) {
+            if (e.Node.Tag is BsonDocument)
+            {
                 changeTypeComboBox.Enabled = false;
                 NameEditTextBox.Enabled = false;
                 ValueEditTextBox.Enabled = false;
@@ -287,8 +236,6 @@ namespace Mongodb_gui
             }
             else if (e.Node.Tag is BsonElement)
             {
-                removeButton.Enabled = true;
-                button1.Enabled = true;
                 BsonElement element = (BsonElement)e.Node.Tag;
                 changeTypeComboBox.Enabled = true;
                 changeTypeComboBox.Text = element.Value.BsonType.ToString();
@@ -306,8 +253,8 @@ namespace Mongodb_gui
                     ValueEditTextBox.Text = "";
                     addButton.Enabled = true;
                 }
-                
-            } 
+
+            }
             else if (e.Node.Tag is BsonString)
             {
                 removeButton.Enabled = true;
@@ -334,14 +281,14 @@ namespace Mongodb_gui
 
         private void NameEditTextBox_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
-        private TreeNode FindParentDocument (TreeNode element)
+        private TreeNode FindParentDocument(TreeNode element)
         {
             if (element.Parent == null)
             {
-                return (TreeNode) element.Clone();
+                return (TreeNode)element.Clone();
             }
             return FindParentDocument(element.Parent);
         }
@@ -391,7 +338,7 @@ namespace Mongodb_gui
                 }
                 else
                 {
-                    var document = (BsonElement) (element.Parent.Tag);
+                    var document = (BsonElement)(element.Parent.Tag);
 
                     if (document.Value is BsonArray)
                     {
@@ -500,7 +447,7 @@ namespace Mongodb_gui
         private void button1_Click(object sender, EventArgs e)
         {
             TreeNode parent = FindParentDocument(PanelSelectedElement);
-            BsonDocument parentDocument = (BsonDocument) parent.Tag.ToBsonDocument().DeepClone();
+            BsonDocument parentDocument = (BsonDocument)parent.Tag.ToBsonDocument().DeepClone();
 
             BsonValue newBsonValue;
             switch (changeTypeComboBox.Text.ToString())
@@ -524,9 +471,9 @@ namespace Mongodb_gui
 
             TreeNode parentReplaced = ReplaceParent(PanelSelectedElement, newElement);
             BsonDocument parentDocumentReplaced = ((BsonDocument)parentReplaced.Tag);
-     
+
             var updateDoc = currentCollection.FindOneAndReplace(parentDocument, parentDocumentReplaced);
-            
+
             int treeNodeIndex = PanelSelectedElement.Parent.Nodes.IndexOf(PanelSelectedElement);
             if (treeNodeIndex != -1)
             {
@@ -572,8 +519,8 @@ namespace Mongodb_gui
             int index = CollectionView.Nodes.IndexOf(CollectionView.SelectedNode);
             CollectionView.SelectedNode.Parent.Nodes.Remove(CollectionView.SelectedNode);
             newNode.Text = nodeName;
-            CollectionView.SelectedNode.Parent.Nodes.Insert(index, newNode); 
-                
+            CollectionView.SelectedNode.Parent.Nodes.Insert(index, newNode);
+
             PanelSelectedElement = newNode;
             CollectionView.SelectedNode = newNode;
             CollectionView.SelectedNode.BackColor = Color.MediumSeaGreen;
@@ -625,7 +572,8 @@ namespace Mongodb_gui
                 int index = CollectionView.SelectedNode.Parent.Nodes.IndexOf(CollectionView.SelectedNode);
                 CollectionView.SelectedNode.Parent.Nodes.Remove(CollectionView.SelectedNode);
                 CollectionView.SelectedNode.Parent.Nodes.Insert(index, newNode);
-            } else
+            }
+            else
             {
                 int index = CollectionView.Nodes.IndexOf(CollectionView.SelectedNode);
                 CollectionView.Nodes.Remove(CollectionView.SelectedNode);
@@ -659,14 +607,20 @@ namespace Mongodb_gui
         private void HideNotifyPanel(Panel notificationPanel, double duration)
         {
             System.Threading.Thread.Sleep((int)duration * 1000);
-            notificationPanel.Invoke(
-                new MethodInvoker(
-                    delegate
-                    {
-                        notificationPanel.Visible = false;
-                    }
-                )
-            );
+            try {
+                notificationPanel.Invoke(
+                    new MethodInvoker(
+                        delegate
+                        {
+                            notificationPanel.Visible = false;
+                        }
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void addButton_Click(object sender, EventArgs e)
@@ -680,7 +634,7 @@ namespace Mongodb_gui
             PanelSelectedElement = CollectionView.SelectedNode;
             TreeNode parent = FindParentDocument(PanelSelectedElement);
             BsonDocument parentDocument = (BsonDocument)parent.Tag.ToBsonDocument().DeepClone();
-            TreeNode parentWithoutNode= DeleteNodeFromParent(CollectionView.SelectedNode);
+            TreeNode parentWithoutNode = DeleteNodeFromParent(CollectionView.SelectedNode);
             BsonDocument parentDocumentWithoutNode = parentWithoutNode.Tag as BsonDocument;
 
             if (CollectionView.SelectedNode.Parent != null)
@@ -711,21 +665,9 @@ namespace Mongodb_gui
             CollectionView.Nodes.Add(treeNode);
         }
 
-        private void searchButton_Click(object sender, EventArgs e)
+        private void ViewCollection_Load(object sender, EventArgs e)
         {
-            Search form = new Search(currentCollection, this);
-            form.Show();
-        }
-
-        private void Refresh_Click(object sender, EventArgs e)
-        {
-            this.RefreshCollectionView();
-        }
-
-        public void RefreshCollectionView ()
-        {
-            var items = mongo.GetItems(currentCollection);
-            FillCollectionView(items);
+            this.FillCollectionView(this.items);
         }
     }
 }

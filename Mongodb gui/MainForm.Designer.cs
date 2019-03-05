@@ -36,6 +36,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.CollectionView = new System.Windows.Forms.TreeView();
             this.editPanel = new System.Windows.Forms.Panel();
+            this.searchButton = new System.Windows.Forms.Button();
             this.removeButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -50,6 +51,7 @@
             this.NotificationText = new System.Windows.Forms.Label();
             this.addNewObject = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.Refresh = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.editPanel.SuspendLayout();
             this.NotificationPanel.SuspendLayout();
@@ -68,8 +70,8 @@
             // 
             // databaseComboBox
             // 
-            this.databaseComboBox.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.databaseComboBox, "databaseComboBox");
+            this.databaseComboBox.BackColor = System.Drawing.Color.White;
             this.databaseComboBox.FormattingEnabled = true;
             this.databaseComboBox.Name = "databaseComboBox";
             this.databaseComboBox.SelectedIndexChanged += new System.EventHandler(this.databaseComboBox_SelectedIndexChanged);
@@ -77,13 +79,14 @@
             // label1
             // 
             resources.ApplyResources(this.label1, "label1");
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Name = "label1";
             // 
             // collectionsComboBox
             // 
-            this.collectionsComboBox.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.collectionsComboBox, "collectionsComboBox");
+            this.collectionsComboBox.BackColor = System.Drawing.Color.White;
             this.collectionsComboBox.FormattingEnabled = true;
             this.collectionsComboBox.Name = "collectionsComboBox";
             this.collectionsComboBox.SelectedIndexChanged += new System.EventHandler(this.collectionsComboBox_SelectedIndexChanged);
@@ -91,6 +94,7 @@
             // label2
             // 
             resources.ApplyResources(this.label2, "label2");
+            this.label2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.label2.ForeColor = System.Drawing.Color.White;
             this.label2.Name = "label2";
             // 
@@ -105,6 +109,8 @@
             // editPanel
             // 
             resources.ApplyResources(this.editPanel, "editPanel");
+            this.editPanel.Controls.Add(this.Refresh);
+            this.editPanel.Controls.Add(this.searchButton);
             this.editPanel.Controls.Add(this.removeButton);
             this.editPanel.Controls.Add(this.addButton);
             this.editPanel.Controls.Add(this.button1);
@@ -115,6 +121,15 @@
             this.editPanel.Controls.Add(this.changeTypeComboBox);
             this.editPanel.Controls.Add(this.label3);
             this.editPanel.Name = "editPanel";
+            // 
+            // searchButton
+            // 
+            this.searchButton.BackColor = System.Drawing.Color.MediumSeaGreen;
+            resources.ApplyResources(this.searchButton, "searchButton");
+            this.searchButton.ForeColor = System.Drawing.SystemColors.Control;
+            this.searchButton.Name = "searchButton";
+            this.searchButton.UseVisualStyleBackColor = false;
+            this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
             // 
             // removeButton
             // 
@@ -166,11 +181,11 @@
             // 
             // changeTypeComboBox
             // 
+            resources.ApplyResources(this.changeTypeComboBox, "changeTypeComboBox");
             this.changeTypeComboBox.FormattingEnabled = true;
             this.changeTypeComboBox.Items.AddRange(new object[] {
             resources.GetString("changeTypeComboBox.Items"),
             resources.GetString("changeTypeComboBox.Items1")});
-            resources.ApplyResources(this.changeTypeComboBox, "changeTypeComboBox");
             this.changeTypeComboBox.Name = "changeTypeComboBox";
             // 
             // label3
@@ -211,17 +226,27 @@
             // 
             resources.ApplyResources(this.panel2, "panel2");
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel2.Controls.Add(this.NotificationPanel);
             this.panel2.Controls.Add(this.editPanel);
             this.panel2.Controls.Add(this.addNewObject);
             this.panel2.Controls.Add(this.CollectionView);
             this.panel2.Name = "panel2";
             // 
+            // Refresh
+            // 
+            this.Refresh.BackColor = System.Drawing.Color.MediumSeaGreen;
+            resources.ApplyResources(this.Refresh, "Refresh");
+            this.Refresh.ForeColor = System.Drawing.SystemColors.Control;
+            this.Refresh.Name = "Refresh";
+            this.Refresh.UseVisualStyleBackColor = false;
+            this.Refresh.Click += new System.EventHandler(this.Refresh_Click);
+            // 
             // MainForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.MediumAquamarine;
+            this.BackColor = System.Drawing.Color.MintCream;
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Name = "MainForm";
@@ -260,6 +285,8 @@
         private System.Windows.Forms.Button removeButton;
         private System.Windows.Forms.Button addNewObject;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button searchButton;
+        private System.Windows.Forms.Button Refresh;
     }
 }
 

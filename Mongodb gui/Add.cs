@@ -15,9 +15,9 @@ namespace Mongodb_gui
     {
         TreeNode node;
         BsonType type;
-        MainForm parent;
+        Form parent;
 
-        public Add(TreeNode selected, MainForm parent)
+        public Add(TreeNode selected, Form parent)
         {
             node = (TreeNode)selected.Clone();
             this.parent = parent;
@@ -86,7 +86,14 @@ namespace Mongodb_gui
                     if (newValue != null)
                     {
                         arr.Add(newValue);
-                        this.parent.addElement(node, tag);
+                        if (parent is MainForm)
+                        {
+                            ((MainForm)parent).addElement(node, tag);
+                        }
+                        else if (parent is ViewCollection)
+                        {
+                            ((ViewCollection)parent).addElement(node, tag);
+                        }
                     }
                 }
                 else if (node.Tag is BsonValue)
@@ -97,7 +104,14 @@ namespace Mongodb_gui
                     if (newValue != null)
                     {
                         arr.Add(newValue);
-                        this.parent.addElement(node, tag);
+                        if (parent is MainForm)
+                        {
+                            ((MainForm)parent).addElement(node, tag);
+                        }
+                        else if (parent is ViewCollection)
+                        {
+                            ((ViewCollection)parent).addElement(node, tag);
+                        }
                     }
                 }
             }
@@ -128,14 +142,28 @@ namespace Mongodb_gui
                     BsonDocument tag = (BsonDocument)node.Tag;
                     tag = tag.DeepClone() as BsonDocument;
                     tag.Add(newEl);
-                    parent.addElement(node, tag);
+                    if (parent is MainForm)
+                    {
+                        ((MainForm)parent).addElement(node, tag);
+                    } else if (parent is ViewCollection)
+                    {
+                        ((ViewCollection)parent).addElement(node, tag);
+                    }
+                    
                 }
                 else if (node.Tag is BsonElement)
                 {
                     BsonElement tag = ((BsonElement)node.Tag).DeepClone();
                     BsonElement newEl = new BsonElement(documentPropertyName.Text, newValue);
                     tag.Value.AsBsonDocument.Add(newEl);
-                    parent.addElement(node, tag);
+                    if (parent is MainForm)
+                    {
+                        ((MainForm)parent).addElement(node, tag);
+                    }
+                    else if (parent is ViewCollection)
+                    {
+                        ((ViewCollection)parent).addElement(node, tag);
+                    }
                 }
             }
 
